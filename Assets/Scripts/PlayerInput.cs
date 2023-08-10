@@ -1,12 +1,24 @@
 using System;
+using UniRx;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
-public sealed class PlayerInput : MonoBehaviour
+public sealed class PlayerInput : MonoBehaviour, IInputService
 {
+    public event Action<float> OnGunRotationSliderValueChanged;
     public event Action OnShootAction;
 
+    [SerializeField] private Slider gunRotationSlider;
+    [SerializeField] private Button shootingButton;
+
     private PlayerInputActions _playerInputActions;
+    private CompositeDisposable _disposable = new();
+
+    private void Update()
+    {
+        GetInputDirection();
+    }
 
     public float GetInputDirection()
     {
@@ -14,16 +26,16 @@ public sealed class PlayerInput : MonoBehaviour
         return inputDirection;
     }
 
-    private void Update()
-    {
-        GetInputDirection();
-    }
-
     private void OnEnable()
     {
         _playerInputActions = new PlayerInputActions();
         _playerInputActions.Player.Enable();
         _playerInputActions.Player.Shoot.performed += Shoot_OnPerformed;
+        gunRotationSlider.onValueChanged.AddListener(_ =>
+        {
+            OnGunRotationSliderValueChanged?.Invoke(gunRotationSlider.value);
+        });
+        shootingButton.OnClickAsObservable().Subscribe(_=>{OnShootAction?.Invoke();}).AddTo(_disposable);
     }
 
     private void Shoot_OnPerformed(InputAction.CallbackContext obj)
@@ -33,11 +45,18 @@ public sealed class PlayerInput : MonoBehaviour
 
     private void OnDisable()
     {
-        _playerInputActions.Disable();
+        RemoveListeners();
     }
 
     private void OnDestroy()
     {
-        _playerInputActions.Disable();
+        RemoveListeners();
+    }
+
+    private void RemoveListeners()
+    {
+        _playerInputActions.Dispose();
+        gunRotationSlider.onValueChanged.RemoveAllListeners();
+
     }
 }

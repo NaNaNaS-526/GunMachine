@@ -127,6 +127,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gun: {fileID: 521427775861090247}
   maxRotation: 50
+  reloadingTime: 2
   bulletPrefab: {fileID: 8596825130892898604, guid: 21489b9f55141a44d81cd2a6a9833d8a, type: 3}
   bulletSpawnPoint: {fileID: 521427775220536361}
   bulletForce: 500
