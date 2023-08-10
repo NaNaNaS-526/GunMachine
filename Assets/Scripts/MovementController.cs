@@ -1,12 +1,12 @@
 using UnityEngine;
 
-public sealed class MovementController : MonoBehaviour
+public class MovementController : MonoBehaviour
 {
-    [Header("Movement")] [SerializeField] private WheelJoint2D rearWheel;
+    [Header("Movement")] 
+    [SerializeField] private WheelJoint2D rearWheel;
     [SerializeField] private WheelJoint2D frontWheel;
 
-    [Range(0.0f, 1000.0f)] [SerializeField]
-    private float movementSpeed;
+    [Range(0.0f, 1000.0f)] [SerializeField] private float movementSpeed;
 
     public void Move(float direction)
     {

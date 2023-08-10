@@ -1,6 +1,5 @@
 using UniRx;
 using UnityEngine;
-using UnityEngine.UI;
 using Zenject;
 
 public sealed class Player : MonoBehaviour
@@ -8,20 +7,47 @@ public sealed class Player : MonoBehaviour
     [SerializeField] private MovementController movementController;
     [SerializeField] private Gun gun;
 
-    private PlayerInput _playerInput;
-    private Slider _gunRotationSlider;
+    private IInputService _inputService;
+
+    private readonly CompositeDisposable _disposable = new();
 
     [Inject]
-    private void Construct(PlayerInput playerInput, Slider gunSlider)
+    private void Construct(IInputService inputService)
     {
-        _playerInput = playerInput;
-        _gunRotationSlider = gunSlider;
+        _inputService = inputService;
     }
 
-    private void Start()
+    private void InputService_OnGunRotationSliderValueChanged(float rotationCoefficient)
     {
-        Observable.EveryUpdate().Subscribe(_ => { movementController.Move(_playerInput.GetInputDirection()); });
-        _gunRotationSlider.onValueChanged.AddListener(_ => { gun.RotateGun(_gunRotationSlider.value); });
-        _playerInput.OnShootAction += (() => gun.Shoot(gun.bulletPrefab));
+        gun.Rotate(rotationCoefficient);
+    }
+
+    private void InputServiceOnShootAction()
+    {
+        gun.Shoot(gun.bulletPrefab);
+    }
+
+    private void OnEnable()
+    {
+        Observable.EveryUpdate().Subscribe(_ => { movementController.Move(_inputService.GetInputDirection()); })
+            .AddTo(_disposable);
+        _inputService.OnGunRotationSliderValueChanged += InputService_OnGunRotationSliderValueChanged;
+        _inputService.OnShootAction += InputServiceOnShootAction;
+    }
+
+    private void OnDisable()
+    {
+        RemoveListeners();
+    }
+
+    private void OnDestroy()
+    {
+        RemoveListeners();
+    }
+
+    private void RemoveListeners()
+    {
+        _disposable.Clear();
+        _inputService.OnShootAction -= InputServiceOnShootAction;
     }
 }

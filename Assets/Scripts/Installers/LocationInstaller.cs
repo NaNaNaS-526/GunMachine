@@ -1,33 +1,40 @@
 using UnityEngine;
-using UnityEngine.Serialization;
-using UnityEngine.UI;
 using Zenject;
 
 namespace Installers
 {
     public sealed class LocationInstaller : MonoInstaller
     {
-        [SerializeField] private Slider gunSlider;
-        [FormerlySerializedAs("playerController")] [SerializeField] private MovementController movementController;
+        [SerializeField] private PlayerInput playerInput;
+        [SerializeField] private Player playerPrefab;
         [SerializeField] private Transform spawnPoint;
 
         public override void InstallBindings()
         {
-            BindGunRotationSlider();
-            BindPlayerController();
+            BindPlayerInput();
+            BindPlayer();
+        }
+        private void BindPlayer()
+        {
+            var player = Container
+                .InstantiatePrefab(playerPrefab, spawnPoint.position, Quaternion.identity, null);
+            
+            Container
+                .Bind<Transform>()
+                .FromInstance(player.transform)
+                .AsSingle();
         }
 
-        private void BindGunRotationSlider()
+        private void BindPlayerInput()
         {
-            Container.Bind<Slider>().FromInstance(gunSlider).NonLazy();
-        }
-
-        private void BindPlayerController()
-        {
-            var player = Container.InstantiatePrefabForComponent<MovementController>(movementController,
-                spawnPoint.position,
-                Quaternion.identity, null);
-            Container.Bind<Transform>().FromInstance(player.transform).NonLazy();
+#if UNITY_EDITOR || UNITY_STANDALONE
+            Container
+                .Bind<IInputService>()
+                .To<PlayerInput>()
+                .FromComponentInNewPrefab(playerInput)
+                .AsSingle()
+                .NonLazy();
+#endif
         }
     }
 }
