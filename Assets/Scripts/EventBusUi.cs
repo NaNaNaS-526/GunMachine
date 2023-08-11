@@ -1,6 +1,7 @@
 ﻿using System;
+using Cysharp.Threading.Tasks;
 
 public static class EventBusUi
 {
-    public static Action<float> OnShot;
+    public static Func<float, UniTaskVoid> OnShot;
 }
