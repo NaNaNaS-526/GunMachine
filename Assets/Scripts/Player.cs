@@ -24,7 +24,7 @@ public sealed class Player : MonoBehaviour
 
     private void InputServiceOnShootAction()
     {
-        gun.Shoot(gun.bulletPrefab);
+        gun.Shoot();
     }
 
     private void OnEnable()
