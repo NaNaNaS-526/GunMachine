@@ -18,7 +18,7 @@ namespace Input
         [SerializeField] private Slider gunPowderSlider;
         [SerializeField] private Button shootButton;
 
-        private CompositeDisposable _disposable = new();
+        private readonly CompositeDisposable _disposable = new();
 
         public float GetInputDirection()
         {
@@ -31,10 +31,18 @@ namespace Input
             {
                 return 1;
             }
+
             return 0;
         }
 
         private void OnEnable()
+        {
+            SetupControls();
+
+            OnGunPowderCoefficientChanged?.Invoke(gunPowderSlider.value);
+        }
+
+        private void SetupControls()
         {
             gunRotationSlider.onValueChanged.AddListener(_ =>
             {
@@ -44,10 +52,8 @@ namespace Input
             shootButton.OnClickAsObservable().Subscribe(_ => { OnShootAction?.Invoke(); }).AddTo(_disposable);
             gunPowderSlider.onValueChanged.AddListener(_ =>
             {
-                OnGunPowderCoefficientChanged?.Invoke((gunPowderSlider.value + 1.0f) * 10.0f);
+                OnGunPowderCoefficientChanged?.Invoke(gunPowderSlider.value);
             });
-
-            OnGunPowderCoefficientChanged?.Invoke((gunPowderSlider.value + 1.0f) * 10.0f);
         }
 
         private void OnDisable()

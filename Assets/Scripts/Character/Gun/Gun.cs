@@ -7,7 +7,7 @@ namespace Character.Gun
     public class Gun : MonoBehaviour
     {
         public Func<float, UniTaskVoid> OnShot;
-    
+
         [Header("Gun")] 
         [SerializeField] private Transform gun;
         [Range(0.0f, 50.0f)] [SerializeField] private float maxRotation;
@@ -19,10 +19,10 @@ namespace Character.Gun
 
         [Range(0.0f, 1000.0f)] [SerializeField]private float baseBulletForce;
 
-        private float _currentBulletForce;
         private BulletPool _pool;
+        private float _currentBulletForce;
         private float _lastShotTime;
-        private bool _isReady = true;
+        private bool _isReadyToShoot = true;
 
         private void Awake()
         {
@@ -39,8 +39,8 @@ namespace Character.Gun
 
         public void Shoot()
         {
-            if (_lastShotTime > 0.0f) _isReady = _lastShotTime + reloadingTime <= Time.time;
-            if (_isReady)
+            if (_lastShotTime > 0.0f) _isReadyToShoot = _lastShotTime + reloadingTime <= Time.time;
+            if (_isReadyToShoot)
             {
                 _lastShotTime = Time.time;
                 var newBullet = _pool.GetFreeBullet();
@@ -49,15 +49,15 @@ namespace Character.Gun
             }
         }
 
-        public void ChangePowderAmount(float coefficient)
-        {
-            _currentBulletForce = baseBulletForce * coefficient;
-        }
-
         public void Rotate(float rotationCoefficient)
         {
             var rotationAmount = rotationCoefficient * maxRotation;
             gun.rotation = Quaternion.Euler(0.0f, 0.0f, rotationAmount);
+        }
+
+        public void ChangePowderAmount(float coefficient)
+        {
+            _currentBulletForce = baseBulletForce * coefficient;
         }
     }
 }

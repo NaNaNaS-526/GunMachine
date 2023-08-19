@@ -31,6 +31,7 @@ namespace Player
         {
             gun.Shoot();
         }
+
         private void InputService_OnGunPowderCoefficientChanged(float coefficient)
         {
             gun.ChangePowderAmount(coefficient);
@@ -38,16 +39,8 @@ namespace Player
 
         private void OnEnable()
         {
-            Observable.EveryUpdate()
-                .Subscribe(_ => { movementController.Move(_inputService.GetInputDirection()); })
-                .AddTo(_disposable);
-        
-            _inputService.OnGunRotationChanged += InputServiceOnGunRotationChanged;
-            _inputService.OnShootAction += InputServiceOnShootAction;
-            _inputService.OnGunPowderCoefficientChanged += InputService_OnGunPowderCoefficientChanged;
+            AddListeners();
         }
-
-       
 
         private void OnDisable()
         {
@@ -57,6 +50,17 @@ namespace Player
         private void OnDestroy()
         {
             RemoveListeners();
+        }
+
+        private void AddListeners()
+        {
+            Observable.EveryUpdate()
+                .Subscribe(_ => { movementController.Move(_inputService.GetInputDirection()); })
+                .AddTo(_disposable);
+
+            _inputService.OnGunRotationChanged += InputServiceOnGunRotationChanged;
+            _inputService.OnShootAction += InputServiceOnShootAction;
+            _inputService.OnGunPowderCoefficientChanged += InputService_OnGunPowderCoefficientChanged;
         }
 
         private void RemoveListeners()
