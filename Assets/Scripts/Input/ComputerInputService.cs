@@ -30,17 +30,18 @@ namespace Input
             _playerInputActions = new PlayerInputActions();
             _playerInputActions.Player.Enable();
             _playerInputActions.Player.Shoot.performed += Shoot_OnPerformed;
+            
             gunRotationSlider.onValueChanged.AddListener(_ =>
             {
                 OnGunRotationChanged?.Invoke(gunRotationSlider.value);
             });
-
-            shootButton.OnClickAsObservable().Subscribe(_ => { OnShootAction?.Invoke(); }).AddTo(_disposable);
             gunPowderSlider.onValueChanged.AddListener(_ =>
             {
-                OnGunPowderCoefficientChanged?.Invoke((gunPowderSlider.value + 1.0f) * 10.0f);
+                OnGunPowderCoefficientChanged?.Invoke(gunPowderSlider.value);
             });
-            OnGunPowderCoefficientChanged?.Invoke((gunPowderSlider.value + 1.0f) * 10.0f);
+            shootButton.OnClickAsObservable().Subscribe(_ => { OnShootAction?.Invoke(); }).AddTo(_disposable);
+            
+            OnGunPowderCoefficientChanged?.Invoke(gunPowderSlider.value);
         }
 
         private void Shoot_OnPerformed(InputAction.CallbackContext ctx)

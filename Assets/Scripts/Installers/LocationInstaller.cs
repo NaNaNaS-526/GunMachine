@@ -11,8 +11,8 @@ namespace Installers
         [SerializeField] private ComputerInputService computerInputService;
         [SerializeField] private MobileInputService mobileInputService;
 
-        [SerializeField] private Player.Player playerPrefab;
-        [SerializeField] private Transform spawnPoint;
+        [SerializeField] private Player.Player player;
+        [SerializeField] private Gun gun;
 
         [SerializeField] private ReloadingView reloadingView;
 
@@ -23,18 +23,36 @@ namespace Installers
             BindReloadingItems();
         }
 
+        private void BindPlayerInput()
+        {
+            if (Application.platform == RuntimePlatform.WindowsEditor ||
+                Application.platform == RuntimePlatform.WindowsPlayer)
+            {
+                Container
+                    .Bind<IInputService>()
+                    .To<ComputerInputService>()
+                    .FromInstance(computerInputService)
+                    .AsSingle();
+            }
+            else if (Application.platform == RuntimePlatform.Android)
+            {
+                Container
+                    .Bind<IInputService>()
+                    .To<MobileInputService>()
+                    .FromInstance(mobileInputService)
+                    .AsSingle();
+            }
+        }
+
         private void BindPlayer()
         {
-            var player = Container
-                .InstantiatePrefab(playerPrefab, spawnPoint.position, Quaternion.identity, null);
-
             Container
-                .Bind<Transform>()
-                .FromInstance(player.transform)
+                .Bind<Player.Player>()
+                .FromInstance(player)
                 .AsSingle();
             Container
                 .Bind<Gun>()
-                .FromComponentOn(player)
+                .FromInstance(gun)
                 .AsSingle();
         }
 
@@ -47,33 +65,6 @@ namespace Installers
                 .FromNew()
                 .AsSingle()
                 .NonLazy();
-        }
-
-        private void BindPlayerInput()
-        {
-            // if (Application.platform == RuntimePlatform.WindowsEditor ||
-            //     Application.platform == RuntimePlatform.WindowsPlayer)
-            // {
-            //     Container
-            //         .Bind<IInputService>()
-            //         .To<ComputerInputService>()
-            //         .FromInstance(computerInputService)
-            //         .AsSingle()
-            //         .NonLazy();
-            //     Destroy(mobileInputService);
-            // }
-            if (Application.platform == RuntimePlatform.Android ||
-                Application.platform == RuntimePlatform.WindowsEditor ||
-                Application.platform == RuntimePlatform.WindowsPlayer)
-            {
-                Container
-                    .Bind<IInputService>()
-                    .To<MobileInputService>()
-                    .FromInstance(mobileInputService)
-                    .AsSingle()
-                    .NonLazy();
-                Destroy(computerInputService);
-            }
         }
     }
 }

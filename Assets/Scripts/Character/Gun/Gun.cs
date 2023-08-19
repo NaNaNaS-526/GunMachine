@@ -24,13 +24,17 @@ namespace Character.Gun
         private float _lastShotTime;
         private bool _isReady = true;
 
+        private void Awake()
+        {
+            _currentBulletForce = baseBulletForce;
+        }
+
         private void Start()
         {
             _pool = new BulletPool(bulletPrefab, 5, bulletSpawnPoint)
             {
                 AutoExpand = true
             };
-            _currentBulletForce = baseBulletForce;
         }
 
         public void Shoot()
