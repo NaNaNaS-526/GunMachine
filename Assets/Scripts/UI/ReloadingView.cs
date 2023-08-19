@@ -10,7 +10,7 @@ namespace UI
 
         public async UniTaskVoid Reloading(float reloadingTime)
         {
-            float time = 0.0f;
+            var time = 0.0f;
             while (time <= reloadingTime)
             {
                 time += Time.deltaTime;

@@ -17,7 +17,7 @@ namespace Input
         [SerializeField] private Button shootButton;
 
         private PlayerInputActions _playerInputActions;
-        private CompositeDisposable _disposable = new();
+        private readonly CompositeDisposable _disposable = new();
 
         public float GetInputDirection()
         {
@@ -27,10 +27,21 @@ namespace Input
 
         private void OnEnable()
         {
+            SetupPlayerInputActions();
+            SetupControls();
+
+            OnGunPowderCoefficientChanged?.Invoke(gunPowderSlider.value);
+        }
+
+        private void SetupPlayerInputActions()
+        {
             _playerInputActions = new PlayerInputActions();
             _playerInputActions.Player.Enable();
+        }
+
+        private void SetupControls()
+        {
             _playerInputActions.Player.Shoot.performed += Shoot_OnPerformed;
-            
             gunRotationSlider.onValueChanged.AddListener(_ =>
             {
                 OnGunRotationChanged?.Invoke(gunRotationSlider.value);
@@ -40,8 +51,6 @@ namespace Input
                 OnGunPowderCoefficientChanged?.Invoke(gunPowderSlider.value);
             });
             shootButton.OnClickAsObservable().Subscribe(_ => { OnShootAction?.Invoke(); }).AddTo(_disposable);
-            
-            OnGunPowderCoefficientChanged?.Invoke(gunPowderSlider.value);
         }
 
         private void Shoot_OnPerformed(InputAction.CallbackContext ctx)
