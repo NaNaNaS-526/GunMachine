@@ -4,37 +4,34 @@ using UnityEngine;
 
 namespace Character.Gun
 {
-    public class Gun : MonoBehaviour
+    public abstract class Gun : MonoBehaviour
     {
         public Func<float, UniTaskVoid> OnShot;
 
         [Header("Gun")] 
-        [SerializeField] private Transform gun;
-        [Range(0.0f, 50.0f)] [SerializeField] private float maxRotation;
-        [Range(0.0f, 20.0f)] [SerializeField] private float reloadingTime;
+        [SerializeField] protected Transform gun;
+        [Range(0.0f, 50.0f)] [SerializeField] protected float maxRotation;
+        [Range(0.0f, 20.0f)] [SerializeField] protected float reloadingTime;
 
         [Header("Bullet")] 
-        [SerializeField] private Rigidbody2D bulletPrefab;
-        [SerializeField] private Transform bulletSpawnPoint;
+        [SerializeField] protected Rigidbody2D bulletPrefab;
+        [SerializeField] protected Transform bulletSpawnPoint;
 
-        [Range(0.0f, 1000.0f)] [SerializeField]private float baseBulletForce;
+        [Range(0.0f, 1000.0f)] [SerializeField]protected float baseBulletForce;
 
         private BulletPool _pool;
         private float _currentBulletForce;
         private float _lastShotTime;
         private bool _isReadyToShoot = true;
 
-        private void Awake()
+        protected void Awake()
         {
             _currentBulletForce = baseBulletForce;
         }
 
-        private void Start()
+        protected void Start()
         {
-            _pool = new BulletPool(bulletPrefab, 5, bulletSpawnPoint)
-            {
-                AutoExpand = true
-            };
+            _pool = new BulletPool(new BulletFactory(bulletPrefab, transform), 5, bulletSpawnPoint);
         }
 
         public void Shoot()
@@ -44,6 +41,7 @@ namespace Character.Gun
             {
                 _lastShotTime = Time.time;
                 var newBullet = _pool.GetFreeBullet();
+                if(newBullet==null) return;
                 newBullet.AddForce(bulletSpawnPoint.right * _currentBulletForce, ForceMode2D.Impulse);
                 OnShot?.Invoke(reloadingTime);
             }
@@ -59,5 +57,10 @@ namespace Character.Gun
         {
             _currentBulletForce = baseBulletForce * coefficient;
         }
+    }
+
+    public class SimpleGun : Gun
+    {
+        
     }
 }
