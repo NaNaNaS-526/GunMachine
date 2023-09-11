@@ -1,4 +1,3 @@
-using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,16 +7,9 @@ namespace UI
     {
         [SerializeField] private Image reloadingIndicator;
 
-        public async UniTaskVoid Reloading(float reloadingTime)
+        public void UpdateReloadingIndicator(float currentAmount)
         {
-            var time = 0.0f;
-            while (time <= reloadingTime)
-            {
-                time += Time.deltaTime;
-                var currentAmount = Mathf.Lerp(0.0f, 1.0f, time / reloadingTime);
-                reloadingIndicator.fillAmount = currentAmount;
-                await UniTask.Yield();
-            }
+            reloadingIndicator.fillAmount = currentAmount;
         }
     }
 }

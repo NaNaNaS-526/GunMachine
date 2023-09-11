@@ -1483,6 +1483,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: GunCar
       objectReference: {fileID: 0}
+    - target: {fileID: 521427775220536361, guid: a3b63b1adfdae504d8007a22ece32614, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 4.21
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
